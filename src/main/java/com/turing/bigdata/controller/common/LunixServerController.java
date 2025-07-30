@@ -69,12 +69,18 @@ public class LunixServerController {
         return sftpService.listFiles(host, port, username, password, remoteDir);
     }
 
+    /**
+     * @descr 执行shell文件
+     *
+     * @param shellPath shell文件
+     * */
+    @ApiOperation(value = "执行shell文件", notes = "执行shell文件接口", produces = "application/json")
     @GetMapping("/runShell")
-    public String runShell() {
+    public String runShell(String shellPath) {
         System.out.println(" >>>>>>>>>>>>>>> 执行本地shell脚本start");
         StringBuilder output = new StringBuilder();
         try {
-            Process process = Runtime.getRuntime().exec("sh /opt/module/spark-3.5.4/libs/run_spark_sql.sh");
+            Process process = Runtime.getRuntime().exec("sh " + shellPath);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {

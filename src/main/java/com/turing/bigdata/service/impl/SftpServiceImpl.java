@@ -51,23 +51,14 @@ public class SftpServiceImpl implements SftpService {
         Channel channel = null;
         JSch jsch = new JSch();
         try {
-            //创建会话
             session = jsch.getSession(username, host, port != null ? port : 22);
-            //设置密码
-            //设置密码
             session.setPassword(password);
-            //设置第一次登陆的时候提示，可选值：(ask | yes | no)
             session.setConfig("StrictHostKeyChecking", "no");
-            //设置连接超时时间
             session.connect(30000);
-            //创建sftp通信通道
             channel = session.openChannel("sftp");
             channel.connect(1000);
-            //创建sftp客户端
             ChannelSftp sftp = (ChannelSftp) channel;
-            //进入远程目录
             sftp.cd(remoteDir);
-            //上传文件
             sftp.put(inputStream, fileName);
             inputStream.close();
         } finally {

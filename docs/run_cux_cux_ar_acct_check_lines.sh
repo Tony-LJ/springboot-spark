@@ -13,7 +13,7 @@ fi
 BIZ_DATE=`date +%Y%m%d -d "${DATA_DATE} -1 day"`
 echo "脚本执行日期:${DATA_DATE}, 业务数据计算日期:${BIZ_DATE}"
 echo ">>>数据同步开始"
-spark-sql --master yarn --deploy-mode client --conf spark.debug.maxToStringFields=300 --conf spark.executor.instances=4 --conf spark.executor.memory=5g --conf spark.executor.cores=3 -e"
+spark-sql --master yarn --queue root --deploy-mode client --conf spark.debug.maxToStringFields=300 --conf spark.executor.instances=4 --conf spark.executor.memory=5g --conf spark.executor.cores=3 -e"
 insert overwrite table bi_data.dwd_oe_order_ds2 partition(pt_d)
 select * from bi_data.dwd_oe_order_ds
 "
