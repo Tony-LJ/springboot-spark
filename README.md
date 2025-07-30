@@ -15,4 +15,10 @@
 ```
 
 # springboot基于spark-launcher构建rest api远程提交spark任务
+```.text
 
+java -jar springboot-spark-1.0.1-SNAPSHOT.jar
+
+http://localhost:8079/doc.html#/home
+http://10.53.0.71:8079/doc.html#/home
+```

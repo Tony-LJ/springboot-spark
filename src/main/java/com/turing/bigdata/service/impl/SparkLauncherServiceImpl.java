@@ -4,6 +4,8 @@ import com.turing.bigdata.service.SparkLauncherService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.launcher.SparkAppHandle;
 import org.apache.spark.launcher.SparkLauncher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import java.util.HashMap;
 @Slf4j
 @Service
 public class SparkLauncherServiceImpl implements SparkLauncherService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     @Value("${hadoop.conf.dir}")
     private String hadoop_conf_dir;
@@ -36,7 +40,9 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
     private String spark_default_parallelism;
 
     @Override
-    public int submitYarn(String appName, String jarPath, String queue,String mainClass) throws IOException {
+    public int submitYarn(String appName,
+                          String jarPath,
+                          String queue,String mainClass) throws IOException {
         int flag = 0;
         HashMap env = new HashMap();
         env.put("HADOOP_CONF_DIR", hadoop_conf_dir);
@@ -57,12 +63,12 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
                 .startApplication(new SparkAppHandle.Listener() {
                     @Override
                     public void stateChanged(SparkAppHandle handle) {
-//                        log.info("**********  state  changed  **********");
+                        logger.info("**********  state  changed  **********");
                     }
 
                     @Override
                     public void infoChanged(SparkAppHandle handle) {
-//                        log.info("**********  info  changed  **********");
+                        logger.info("**********  info  changed  **********");
                     }
                 });
 
@@ -70,7 +76,7 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-//                log.error(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
         if ("FINISHED".equalsIgnoreCase(handler.getState().toString())){
@@ -83,7 +89,9 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
     }
 
     @Override
-    public int submitLocal(String appName, String jarPath, String queue,String mainClass) throws IOException {
+    public int submitLocal(String appName,
+                           String jarPath,
+                           String queue, String mainClass) throws IOException {
         int flag = 0;
         HashMap env = new HashMap();
         env.put("HADOOP_CONF_DIR", hadoop_conf_dir);
@@ -105,12 +113,12 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
                 .startApplication(new SparkAppHandle.Listener() {
                     @Override
                     public void stateChanged(SparkAppHandle handle) {
-//                        log.info("**********  state  changed  **********");
+                        logger.info("**********  state  changed  **********");
                     }
 
                     @Override
                     public void infoChanged(SparkAppHandle handle) {
-//                        log.info("**********  info  changed  **********");
+                        logger.info("**********  info  changed  **********");
                     }
                 });
 
@@ -118,7 +126,7 @@ public class SparkLauncherServiceImpl implements SparkLauncherService {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-//                log.error(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
         if ("FINISHED".equalsIgnoreCase(handler.getState().toString())){

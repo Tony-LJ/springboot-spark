@@ -20,10 +20,13 @@ public class SparkLauncherController {
     @Autowired
     private SparkLauncherService sparkLauncherService;
 
-    @PostMapping("/yarn/runSparkJob")
-    public ApiResponse runSparkJob(String appName,
-                                   String jarPath,
-                                   String queue, String mainClass) throws IOException {
+    /**
+     * @descr 执行Spark Jar作业
+     * */
+    @PostMapping("/yarn/runSparkYarnJob")
+    public ApiResponse runSparkYarnJob(String appName,
+                                       String jarPath,
+                                       String queue, String mainClass) throws IOException {
 
         int flag = sparkLauncherService.submitYarn(appName, jarPath,queue, mainClass);
         if (flag == -1) {
@@ -33,4 +36,12 @@ public class SparkLauncherController {
         return ApiResponse.success();
     }
 
+    /**
+     * @descr 执行spark-sql脚本作业
+     * */
+    @PostMapping("/yarn/runSparkSqlYarnJob")
+    public ApiResponse runSparkSqlYarnJob(String sqlPath) {
+
+        return ApiResponse.success();
+    }
 }

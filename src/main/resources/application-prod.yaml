@@ -1,0 +1,15 @@
+server:
+  servlet:
+    multipart:
+      enabled: true
+      # ??????
+      max-file-size: 900MB
+      # ??????????
+      max-request-size: 900MB
+
+sftp_ubantu:
+  host: 10.53.0.71
+  port: 22
+  username: root
+  password: EEEeee111
+  remoteDir: /opt/project/springboot
