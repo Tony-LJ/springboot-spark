@@ -1,10 +1,12 @@
 package com.turing.bigdata.controller.common;
 
+import com.turing.bigdata.entity.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +15,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Api(tags = "文件操作", description = "文件操作接口")
@@ -83,32 +88,43 @@ public class FileController {
     }
 
     @ApiOperation(value = "文件删除", notes = "文件删除接口", produces = "application/json")
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteFile(@RequestParam("filePath") String filePath) {
+    @DeleteMapping("/file/delete")
+    public ApiResponse<String> deleteFile(@RequestParam("filePath") String filePath) {
         try {
             // 安全检查：防止路径遍历攻击
             if (filePath.contains("../") || filePath.contains("..\\")) {
-                return ResponseEntity.badRequest().body("非法文件路径");
+                return ApiResponse.fail(500,"非法文件路径");
             }
-            // 构建完整文件路径
-            File file = new File(UPLOAD_DIR + File.separator + filePath);
+            File file = new File(filePath);
             // 验证文件是否存在
             if (!file.exists()) {
-                return ResponseEntity.notFound().build();
+                return ApiResponse.fail(500,"文件不存在");
             }
             // 验证确实是文件（不是目录）
             if (!file.isFile()) {
-                return ResponseEntity.badRequest().body("指定的路径不是文件");
+                return ApiResponse.fail(500,"指定的路径不是文件");
             }
             // 删除文件
-            if (file.delete()) {
-                return ResponseEntity.ok("文件删除成功");
-            } else {
-                return ResponseEntity.unprocessableEntity().body("");
-            }
+            file.delete();
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("没有删除权限");
+            return ApiResponse.fail(500,"没有删除权限");
         }
+
+        return ApiResponse.success("文件删除成功");
     }
 
+    /**
+     * @param dirPath  指定目录路径
+     * */
+    @ApiOperation(value = "目录文件查看", notes = "目录文件查看接口", produces = "application/json")
+    @GetMapping("/file/listFiles")
+    public ApiResponse<List<String>> listFiles(@RequestParam("dirPath") String dirPath) {
+        File directory = new File(dirPath);
+        File[] files = directory.listFiles();
+        List<String> filesList = Arrays.stream(files)
+                .map(File::getName)
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(filesList);
+    }
 }
