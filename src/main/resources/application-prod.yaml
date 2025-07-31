@@ -2,9 +2,7 @@ server:
   servlet:
     multipart:
       enabled: true
-      # ??????
       max-file-size: 900MB
-      # ??????????
       max-request-size: 900MB
 
 sftp_ubantu:
@@ -14,10 +12,10 @@ sftp_ubantu:
   password: EEEeee111
   remoteDir: /opt/project/springboot
 
-#  ??????
+# 文件上传下载
 file:
   storage:
-    # Windows??
+    # Windows
     base-dir: D:\\project\\springboot-spark\\docs
-    # Linux??
+    # Linux
     # base-dir: /opt/project/springboot

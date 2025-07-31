@@ -1,20 +1,20 @@
 package com.turing.bigdata.controller.common;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
+import com.turing.bigdata.common.utils.ShellUtils;
 import com.turing.bigdata.entity.ApiResponse;
 import com.turing.bigdata.service.SftpService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Api(tags = "Lunix服务器操作", description = "Lunix服务器操作接口")
@@ -25,68 +25,17 @@ public class LunixServerController {
     @Autowired
     private SftpService sftpService;
 
-    /**
-     * @param file 文件覆盖上传
-     * */
-    @ApiOperation(value = "文件上传", notes = "文件上传接口", produces = "application/json")
-    @PostMapping("/uploadOverlayFile")
-    public ApiResponse uploadOverlayFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ApiResponse.fail(500,"No file uploaded.");
-        }
-        try {
-            // 指定Linux服务器上的文件路径
-            String serverFilePath = "/opt/project/springboot";
-            File dest = new File(serverFilePath);
-            // 使用Apache Commons IO库覆盖文件
-            FileUtils.writeByteArrayToFile(dest, file.getBytes());
-            return ApiResponse.success("File uploaded and overwritten successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ApiResponse.fail(500,"Failed to upload file.");
-        }
-    }
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    /**
-     * @param file 文件
-     * */
-    @ApiOperation(value = "文件上传", notes = "文件上传接口", produces = "application/json")
-    @PostMapping("/uploadFile")
-    public ApiResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ApiResponse.fail(500,"文件为空,请重新上传文件");
-        }
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-            sftpService.uploadFile(inputStream, file.getOriginalFilename());
-            return ApiResponse.success("文件上传成功,文件目录：/opt/project/springboot");
-        } catch (IOException | JSchException | SftpException e) {
-            return ApiResponse.fail(500,"文件上传失败"+e.getMessage());
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+    @ApiOperation(value = "本地执行shell脚本", notes = "本地执行shell脚本接口", produces = "application/json")
+    @PostMapping("/local/command/shellLocalExecute")
+    public ApiResponse<List<String>> shellLocalExecute(@RequestParam("filePath") String filePath) {
+        logger.info("传入参数|filePath:{}",filePath);
+        logger.info("本地shell命令开始执行...");
+        List<String> execLogList = ShellUtils.exceShell(filePath);
+        logger.info("本地shell命令结束执行...");
 
-    /**
-     * @param filePath 文件
-     * */
-    @ApiOperation(value = "指定目录文件查看", notes = "指定目录文件查看接口", produces = "application/json")
-    @PostMapping("/listFiles")
-    public List<String> listFiles(String filePath) {
-        String host = "10.53.0.71";
-        int port = 22;
-        String username = "root";
-        String password = "EEEeee111";
-        String remoteDir = filePath;
-
-        return sftpService.listFiles(host, port, username, password, remoteDir);
+        return ApiResponse.success(execLogList);
     }
 
     /**

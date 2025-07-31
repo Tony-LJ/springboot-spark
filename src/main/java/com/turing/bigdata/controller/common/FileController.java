@@ -1,11 +1,13 @@
 package com.turing.bigdata.controller.common;
 
+//import com.turing.bigdata.entity.ApiResponse;
 import com.turing.bigdata.entity.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,12 +36,17 @@ public class FileController {
 //    private static final String UPLOAD_DIR = "D:\\project\\springboot-spark\\docs\\";
     private static final String UPLOAD_DIR = "/opt/project/springboot/";
 
+    /**
+     * @param fileDir 文件目录
+     * @param file 上传文件
+     * */
     @ApiOperation(value = "文件上传", notes = "文件上传接口", produces = "application/json")
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadFile(@RequestParam("fileDir") String fileDir,
+                                             @RequestParam("file") MultipartFile file) {
         // 获取文件名和路径
         String fileName = file.getOriginalFilename();
-        Path path = Paths.get(UPLOAD_DIR + fileName);
+        Path path = Paths.get(fileDir + fileName);
 
         // 存储文件到指定路径
         try {
@@ -51,15 +58,20 @@ public class FileController {
         }
     }
 
+    /**
+     * @param fileDir 文件目录
+     * @param files 上传文件
+     * */
     @ApiOperation(value = "多文件上传", notes = "多文件上传接口", produces = "application/json")
     @PostMapping("/uploadMultiple")
-    public ResponseEntity<String> uploadMultipleFiles(@RequestParam("files") List<MultipartFile> files) {
+    public ResponseEntity<String> uploadMultipleFiles(@RequestParam("fileDir") String fileDir,
+                                                      @RequestParam("files") List<MultipartFile> files) {
         StringBuilder fileNames = new StringBuilder();
 
         // 处理每个文件
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
-            Path path = Paths.get(UPLOAD_DIR + fileName);
+            Path path = Paths.get(fileDir + fileName);
             try {
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
                 fileNames.append(fileName).append(" ");
@@ -79,10 +91,10 @@ public class FileController {
      * */
     @ApiOperation(value = "文件下载", notes = "文件下载接口", produces = "application/json")
     @GetMapping("/download/")
-    public ApiResponse<String>  downloadFile(@RequestParam("filePath") String filePath,
-                                             @RequestParam("fileName") String fileName,
-                                             @RequestParam("isTag") Boolean isTag,
-                                             HttpServletResponse response) throws Exception {
+    public ApiResponse<String> downloadFile(@RequestParam("filePath") String filePath,
+                                            @RequestParam("fileName") String fileName,
+                                            @RequestParam("isTag") Boolean isTag,
+                                            HttpServletResponse response) throws Exception {
 //        String filePath = "D:\\project\\springboot-spark\\docs\\run_cux_cux_ar_acct_check_lines.sh";
 //        String fileName = "IO_run_cux_cux_ar_acct_check_lines.sh";
         Calendar calendar = Calendar.getInstance();
