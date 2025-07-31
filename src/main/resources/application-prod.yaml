@@ -13,3 +13,11 @@ sftp_ubantu:
   username: root
   password: EEEeee111
   remoteDir: /opt/project/springboot
+
+#  ??????
+file:
+  storage:
+    # Windows??
+    base-dir: D:\\project\\springboot-spark\\docs
+    # Linux??
+    # base-dir: /opt/project/springboot
