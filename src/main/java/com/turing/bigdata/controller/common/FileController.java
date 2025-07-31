@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +25,8 @@ import java.util.List;
 @RequestMapping("/file")
 public class FileController {
 
-//    private static final String UPLOAD_DIR = "D:\\project\\springboot-spark\\docs";
-    private static final String UPLOAD_DIR = "/opt/project/springboot";
+    private static final String UPLOAD_DIR = "D:\\project\\springboot-spark\\docs";
+//    private static final String UPLOAD_DIR = "/opt/project/springboot";
 
     @ApiOperation(value = "文件上传", notes = "文件上传接口", produces = "application/json")
     @PostMapping("/upload")
@@ -79,6 +80,35 @@ public class FileController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @ApiOperation(value = "文件删除", notes = "文件删除接口", produces = "application/json")
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteFile(@RequestParam("filePath") String filePath) {
+        try {
+            // 安全检查：防止路径遍历攻击
+            if (filePath.contains("../") || filePath.contains("..\\")) {
+                return ResponseEntity.badRequest().body("非法文件路径");
+            }
+            // 构建完整文件路径
+            File file = new File(UPLOAD_DIR + File.separator + filePath);
+            // 验证文件是否存在
+            if (!file.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            // 验证确实是文件（不是目录）
+            if (!file.isFile()) {
+                return ResponseEntity.badRequest().body("指定的路径不是文件");
+            }
+            // 删除文件
+            if (file.delete()) {
+                return ResponseEntity.ok("文件删除成功");
+            } else {
+                return ResponseEntity.unprocessableEntity().body("");
+            }
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("没有删除权限");
+        }
     }
 
 }

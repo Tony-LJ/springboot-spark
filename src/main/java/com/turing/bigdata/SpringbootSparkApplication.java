@@ -2,10 +2,15 @@ package com.turing.bigdata;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
- * @author
+ * @descr 景旺电子数据赋能系统
+ *
+ * @author Tony
+ * @date 2025-07
  */
+@EnableAsync
 @SpringBootApplication
 public class SpringbootSparkApplication {
 
