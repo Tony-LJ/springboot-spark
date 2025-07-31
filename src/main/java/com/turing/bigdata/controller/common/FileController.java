@@ -4,22 +4,23 @@ import com.turing.bigdata.entity.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +31,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/file")
 public class FileController {
 
-    private static final String UPLOAD_DIR = "D:\\project\\springboot-spark\\docs";
-//    private static final String UPLOAD_DIR = "/opt/project/springboot";
+//    private static final String UPLOAD_DIR = "D:\\project\\springboot-spark\\docs\\";
+    private static final String UPLOAD_DIR = "/opt/project/springboot/";
 
     @ApiOperation(value = "文件上传", notes = "文件上传接口", produces = "application/json")
     @PostMapping("/upload")
@@ -71,24 +72,38 @@ public class FileController {
         return ResponseEntity.ok("Files uploaded successfully: " + fileNames.toString());
     }
 
+    /**
+     * @param fileName
+     * @param filePath
+     * @param isTag 是否带下载日期
+     * */
     @ApiOperation(value = "文件下载", notes = "文件下载接口", produces = "application/json")
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
-        Path filePath = Paths.get(UPLOAD_DIR + fileName);
-        Resource resource = new FileSystemResource(filePath.toFile());
+    @GetMapping("/download/")
+    public ApiResponse<String>  downloadFile(@RequestParam("filePath") String filePath,
+                                             @RequestParam("fileName") String fileName,
+                                             @RequestParam("isTag") Boolean isTag,
+                                             HttpServletResponse response) throws Exception {
+//        String filePath = "D:\\project\\springboot-spark\\docs\\run_cux_cux_ar_acct_check_lines.sh";
+//        String fileName = "IO_run_cux_cux_ar_acct_check_lines.sh";
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String formattedDateTime = formatter.format(now);
 
-        if (!resource.exists()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        try {
+            if(isTag) {
+                download(filePath, formattedDateTime + "_" + fileName, response);
+            }
+            download(filePath,fileName,response);
+        } catch (Exception e) {
+            return ApiResponse.fail(500, "文件下载失败");
         }
 
-        // 返回文件流
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        return ApiResponse.success(filePath);
     }
 
     @ApiOperation(value = "文件删除", notes = "文件删除接口", produces = "application/json")
-    @DeleteMapping("/file/delete")
+    @DeleteMapping("/delete")
     public ApiResponse<String> deleteFile(@RequestParam("filePath") String filePath) {
         try {
             // 安全检查：防止路径遍历攻击
@@ -117,7 +132,7 @@ public class FileController {
      * @param dirPath  指定目录路径
      * */
     @ApiOperation(value = "目录文件查看", notes = "目录文件查看接口", produces = "application/json")
-    @GetMapping("/file/listFiles")
+    @GetMapping("/listFiles")
     public ApiResponse<List<String>> listFiles(@RequestParam("dirPath") String dirPath) {
         File directory = new File(dirPath);
         File[] files = directory.listFiles();
@@ -126,5 +141,27 @@ public class FileController {
                 .collect(Collectors.toList());
 
         return ApiResponse.success(filesList);
+    }
+
+    /**
+     * 通过IOUtils以流的形式下载
+     * @param filePath
+     * @param fileName
+     * @param response
+     */
+    public void download(String filePath,
+                         String fileName, HttpServletResponse response) throws Exception {
+        fileName = URLEncoder.encode(fileName,"UTF-8");
+        File file=new File(filePath);
+
+        if(!file.exists()){
+            throw new Exception("文件不存在");
+        }
+
+        response.setHeader("Content-disposition","attachment;filename="+ fileName);
+        FileInputStream fileInputStream = new FileInputStream(file);
+        IOUtils.copy(fileInputStream,response.getOutputStream());
+        response.flushBuffer();
+        fileInputStream.close();
     }
 }
