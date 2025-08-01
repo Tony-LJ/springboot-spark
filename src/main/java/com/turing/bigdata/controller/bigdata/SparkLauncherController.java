@@ -54,7 +54,6 @@ public class SparkLauncherController {
     }
 
     public String runShell(String shellPath) {
-        System.out.println(" >>>>>>>>>>>>>>> 执行本地shell脚本start");
         StringBuilder output = new StringBuilder();
         try {
             Process process = Runtime.getRuntime().exec("sh " + shellPath);
