@@ -46,6 +46,19 @@ public class Knife4jConfiguration {
         return docket;
     }
 
+    @Bean(value = "defaultApi3")
+    @Order(3)
+    public Docket defaultApi3() {
+        Docket docket=new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .groupName("数仓操作API接口")
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.turing.bigdata.controller.warehouse"))
+                .paths(PathSelectors.any())
+                .build();
+        return docket;
+    }
+
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("景旺电子数据pipeline服务")  //标题

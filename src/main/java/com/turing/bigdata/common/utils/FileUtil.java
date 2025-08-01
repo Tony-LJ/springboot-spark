@@ -1,17 +1,9 @@
 package com.turing.bigdata.common.utils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件工具类

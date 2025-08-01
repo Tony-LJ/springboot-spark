@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.bigdata.dao.mapper.HiveMetastoreMapper">
+
+    <select id="getWarehouseMetastoreInfos" resultType="com.turing.bigdata.entity.WarehouseMetastore">
+        select t.SD_ID as sdId,
+               d.NAME as dbName,
+               r.TBL_NAME as tableName,
+               r.OWNER as owner,
+               t.LOCATION as location,
+               s.COMMENT as comment,
+               s.COLUMN_NAME as columnName,
+               s.TYPE_NAME as typeName,
+               p.PART_NAME as partName
+        from  hive.TBLS r
+        left join hive.SDS t on t.SD_ID = r.SD_ID
+        left join hive.CDS c on t.CD_ID = c.CD_ID
+        left join hive.COLUMNS_V2 s on s.CD_ID = c.CD_ID
+        left join hive.PARTITIONS p on p.SD_ID = r.SD_ID
+        left join hive.DBS d on r.DB_ID = d.DB_ID
+        where d.NAME != 'bi_tmp'
+        limit 200
+    </select>
+
+    <select id="getWarehouseMetastoreInfosByColumnName" resultType="com.turing.bigdata.entity.WarehouseMetastore">
+        select t.SD_ID as sdId,
+               d.NAME as dbName,
+               r.TBL_NAME as tableName,
+               r.OWNER as owner,
+               t.LOCATION as location,
+               s.COMMENT as comment,
+               s.COLUMN_NAME as columnName,
+               s.TYPE_NAME as typeName,
+               p.PART_NAME as partName
+        from  metastore.TBLS r
+        left join metastore.SDS t on t.SD_ID = r.SD_ID
+        left join metastore.CDS c on t.CD_ID = c.CD_ID
+        left join metastore.COLUMNS_V2 s on s.CD_ID = c.CD_ID
+        left join metastore.PARTITIONS p on p.SD_ID = r.SD_ID
+        left join metastore.DBS d on r.DB_ID = d.DB_ID
+        where s.COLUMN_NAME = #{columnName} and d.NAME != 'bi_tmp'
+        limit 200
+    </select>
+
+    <select id="getWarehouseMetastoreInfosByComment" resultType="com.turing.bigdata.entity.WarehouseMetastore">
+        select t.SD_ID as sdId,
+               d.NAME as dbName,
+               r.TBL_NAME as tableName,
+               r.OWNER as owner,
+               t.LOCATION as location,
+               s.COMMENT as comment,
+               s.COLUMN_NAME as columnName,
+               s.TYPE_NAME as typeName,
+               p.PART_NAME as partName
+        from  metastore.TBLS r
+        left join metastore.SDS t on t.SD_ID = r.SD_ID
+        left join metastore.CDS c on t.CD_ID = c.CD_ID
+        left join metastore.COLUMNS_V2 s on s.CD_ID = c.CD_ID
+        left join metastore.PARTITIONS p on p.SD_ID = r.SD_ID
+        left join metastore.DBS d on r.DB_ID = d.DB_ID
+        where s.COMMENT = #{comment} and d.NAME != 'bi_tmp'
+    </select>
+
+    <select id="fuzzyQueryWarehouseMetastoreInfosByComment" resultType="com.turing.bigdata.entity.WarehouseMetastore">
+        select t.SD_ID as sdId,
+               d.NAME as dbName,
+               r.TBL_NAME as tableName,
+               r.OWNER as owner,
+               t.LOCATION as location,
+               s.COMMENT as comment,
+               s.COLUMN_NAME as columnName,
+               s.TYPE_NAME as typeName,
+               p.PART_NAME as partName
+        from  metastore.TBLS r
+        left join metastore.SDS t on t.SD_ID = r.SD_ID
+        left join metastore.CDS c on t.CD_ID = c.CD_ID
+        left join metastore.COLUMNS_V2 s on s.CD_ID = c.CD_ID
+        left join metastore.PARTITIONS p on p.SD_ID = r.SD_ID
+        left join metastore.DBS d on r.DB_ID = d.DB_ID
+        where s.COMMENT like #{comment} and d.NAME != 'bi_tmp'
+    </select>
+
+</mapper>
