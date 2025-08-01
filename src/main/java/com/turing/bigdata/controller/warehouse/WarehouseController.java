@@ -26,10 +26,10 @@ public class WarehouseController {
      * @descr 根据字段中文名称查询
      * @param columnName
      * */
-    @ApiOperation(value = "用字段名称查询数仓元数据", notes = "用字段名称查询数仓元数据接口", produces = "application/json")
+    @ApiOperation(value = "查询数仓元数据", notes = "查询数仓元数据接口", produces = "application/json")
     @PostMapping("/metastore/getWarehouseMetastoreInfosByColumnName")
     private ApiResponse<List<WarehouseMetastore>> getWarehouseMetastoreInfosByColumnName(@RequestParam("columnName") String columnName) {
-        List<WarehouseMetastore> warehouseMetastoreInfos = hiveMetastoreMapper.getWarehouseMetastoreInfosByColumnName(columnName);
+        List<WarehouseMetastore> warehouseMetastoreInfos = hiveMetastoreMapper.getMetastoreInfosByColumnName(columnName);
         return ApiResponse.success(warehouseMetastoreInfos);
     }
 
@@ -37,22 +37,22 @@ public class WarehouseController {
      * @descr 根据字段中文名称查询(精准查询)
      * @param comment
      * */
-    @ApiOperation(value = "用字段中文名称精准查询数仓元数据", notes = "用字段中文名称精准查询数仓元数据接口", produces = "application/json")
+    @ApiOperation(value = "精准查询数仓元数据", notes = "精准查询数仓元数据接口", produces = "application/json")
     @PostMapping("/metastore/getWarehouseMetastoreInfosByComment")
-    private List<WarehouseMetastore>  getWarehouseMetastoreInfosByComment(@RequestParam("comment") String comment) {
-        List<WarehouseMetastore> warehouseMetastoreInfos =  hiveMetastoreMapper.getWarehouseMetastoreInfosByComment(comment);
-        return warehouseMetastoreInfos;
+    private ApiResponse<List<WarehouseMetastore>>  getWarehouseMetastoreInfosByComment(@RequestParam("comment") String comment) {
+        List<WarehouseMetastore> warehouseMetastoreInfos =  hiveMetastoreMapper.getMetastoreInfosByComment(comment);
+        return ApiResponse.success(warehouseMetastoreInfos);
     }
 
     /**
      * @descr 根据字段中文名称查询(模糊查询)
      * @param comment
      * */
-    @ApiOperation(value = "用字段中文名称模糊查询数仓元数据", notes = "用字段中文名称模糊查询数仓元数据接口", produces = "application/json")
+    @ApiOperation(value = "模糊查询数仓元数据", notes = "模糊查询数仓元数据接口", produces = "application/json")
     @PostMapping("/metastore/fuzzyQueryWarehouseMetastoreInfosByComment")
-    private List<WarehouseMetastore>  fuzzyQueryWarehouseMetastoreInfosByComment(@RequestParam("comment") String comment) {
-        List<WarehouseMetastore> warehouseMetastoreInfos =  hiveMetastoreMapper.fuzzyQueryWarehouseMetastoreInfosByComment("%" + comment + "%");
-        return warehouseMetastoreInfos;
+    private ApiResponse<List<WarehouseMetastore>>  fuzzyQueryWarehouseMetastoreInfosByComment(@RequestParam("comment") String comment) {
+        List<WarehouseMetastore> warehouseMetastoreInfos =  hiveMetastoreMapper.fuzzyQueryMetastoreInfosByComment("%" + comment + "%");
+        return ApiResponse.success(warehouseMetastoreInfos);
     }
 
 }

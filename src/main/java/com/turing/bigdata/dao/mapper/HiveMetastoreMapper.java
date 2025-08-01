@@ -17,18 +17,17 @@ public interface HiveMetastoreMapper extends BaseMapper<WarehouseMetastore> {
     List<WarehouseMetastore> getWarehouseMetastoreInfos();
 
     @DS("PROD_MYSQL")
-    List<WarehouseMetastore> getWarehouseMetastoreInfosByColumnName(@Param("columnName") String columnName);
+    List<WarehouseMetastore> getMetastoreInfosByColumnName(@Param("columnName") String columnName);
 
     /**
      * 根据字段中文名称精准查询
      * */
     @DS("PROD_MYSQL")
-    List<WarehouseMetastore> getWarehouseMetastoreInfosByComment(@Param("comment") String comment);
+    List<WarehouseMetastore> getMetastoreInfosByComment(@Param("comment") String comment);
 
     /**
      * 根据字段中文名称模糊查询
      * */
     @DS("PROD_MYSQL")
-    List<WarehouseMetastore> fuzzyQueryWarehouseMetastoreInfosByComment(@Param("comment") String comment);
-
+    List<WarehouseMetastore> fuzzyQueryMetastoreInfosByComment(@Param("comment") String comment);
 }
